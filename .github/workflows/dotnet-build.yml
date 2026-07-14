@@ -1,4 +1,4 @@
-name: .NET Build and Run
+name: .NET CI - Lint, Test, Build and Run
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-run:
+  build-test-run:
     runs-on:
       - self-hosted
       - Linux
@@ -25,7 +25,18 @@ jobs:
           dotnet --version
 
       - name: Restore Dependencies
-        run: dotnet restore dotnet-demo1.csproj
+        run: |
+          dotnet restore dotnet-demo1.csproj
+          dotnet restore dotnet-demo1.Tests/dotnet-demo1.Tests.csproj
+
+      - name: Lint Check
+        run: dotnet format dotnet-demo1.csproj --verify-no-changes
+
+      - name: Run Unit Tests
+        run: |
+          dotnet test dotnet-demo1.Tests/dotnet-demo1.Tests.csproj \
+            --configuration Release \
+            --logger "console;verbosity=normal"
 
       - name: Build Application
         run: dotnet build dotnet-demo1.csproj --configuration Release --no-restore
