@@ -1,0 +1,34 @@
+name: .NET Build and Run
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-run:
+    runs-on:
+      - self-hosted
+      - Linux
+      - X64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify Self-Hosted Runner
+        run: |
+          hostname
+          whoami
+          pwd
+          dotnet --version
+
+      - name: Restore Dependencies
+        run: dotnet restore dotnet-demo1.csproj
+
+      - name: Build Application
+        run: dotnet build dotnet-demo1.csproj --configuration Release --no-restore
+
+      - name: Run Application
+        run: dotnet run --project dotnet-demo1.csproj --configuration Release --no-build
